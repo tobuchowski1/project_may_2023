@@ -1,0 +1,11 @@
+version: "1.0"
+
+services:
+   konkurs_ing:
+      container_name: konkurs_ing
+      image: konkurs-local:1.0
+      ports:
+       - 8080:8080
+      volumes:
+       - ./:/konkurs/
+      command: sh -c "/konkurs/build.sh && /konkurs/run.sh"
