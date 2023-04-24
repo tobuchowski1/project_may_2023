@@ -34,7 +34,7 @@ public class Server extends AbstractHttpServer
 			 switch (endpoint) {
 			 	case "/transactions/report":
 				
-					return ok(ctx, req.isKeepAlive.value, TransactionsApp.solve(buf), MediaType.JSON);
+					return json(ctx, req.isKeepAlive.value, TransactionsApp.solve(buf));
 			 	default:
 			 		return HttpStatus.NOT_FOUND;
 			 }
@@ -42,9 +42,6 @@ public class Server extends AbstractHttpServer
 			return HttpStatus.ERROR;
 		}
 	 }
-	
-	 
-	 //return ok(ctx, req.isKeepAlive.value, buf.asText().getBytes(), MediaType.JSON);
   
 	 return HttpStatus.NOT_FOUND;
  }

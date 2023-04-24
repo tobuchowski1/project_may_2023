@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 
 import java.nio.ByteBuffer;
 import org.rapidoid.buffer.Buf;
@@ -13,7 +14,6 @@ import org.rapidoid.buffer.Buf;
 import com.dslplatform.json.DslJson;
 
 public class TransactionsApp {
-	private static final byte HELLO_WORLD[] = "Hello, World!".getBytes();
 	private static DslJson<Transaction> inputParser = new DslJson<Transaction>();
 	private static DslJson<AccountBalance> outputSerializer = new DslJson<AccountBalance>();
 	
@@ -41,10 +41,12 @@ public class TransactionsApp {
 				}
 		);
 		
+		// do estimation how big should the buffer be
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
-		AccountBalance[] unorderedResult = balances.values().toArray(new AccountBalance[balances.size()]);
+		List<AccountBalance> result = new ArrayList<AccountBalance>(balances.values());
+		Collections.sort(result);
 		
-		outputSerializer.serialize(unorderedResult, os);
+		outputSerializer.serialize(result, os);
 		return os.toByteArray();
 	}
 	
