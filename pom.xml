@@ -62,5 +62,10 @@
   		<artifactId>rapidoid-quick</artifactId>
   		<version>5.5.5</version>
   	</dependency>
+  	<dependency>
+  		<groupId>com.dslplatform</groupId>
+  		<artifactId>dsl-json-java8</artifactId>
+  		<version>1.10.0</version>
+	</dependency>
   </dependencies>
 </project>
