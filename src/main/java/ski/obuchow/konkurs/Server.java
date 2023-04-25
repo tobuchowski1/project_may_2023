@@ -10,6 +10,7 @@ import org.rapidoid.http.MediaType;
 import org.rapidoid.net.abstracts.Channel;
 import org.rapidoid.net.impl.RapidoidHelper;
 
+import ski.obuchow.konkurs.atm.ATMApp;
 import ski.obuchow.konkurs.onlinegame.GameApp;
 import ski.obuchow.konkurs.transactions.TransactionsApp;
 
@@ -34,6 +35,8 @@ public class Server extends AbstractHttpServer
 					return json(ctx, req.isKeepAlive.value, TransactionsApp.solve(buf));
 			 	case "/onlinegame/calculate":
 			 		return json(ctx, req.isKeepAlive.value, GameApp.solve(buf));
+			 	case "/atms/calculateOrder":
+			 		return json(ctx, req.isKeepAlive.value, ATMApp.solve(buf));
 			 	default:
 			 		return HttpStatus.NOT_FOUND;
 			 }
