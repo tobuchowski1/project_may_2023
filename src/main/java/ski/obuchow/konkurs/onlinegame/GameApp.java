@@ -66,7 +66,7 @@ public class GameApp {
 			}
 		}
 		
-		// do estimation how big should the buffer be
+		//TODO do estimation how big should the buffer be
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
 		outputSerializer.serialize(result, os);
 		return os.toByteArray();

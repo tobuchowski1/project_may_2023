@@ -22,26 +22,26 @@ public class TransactionsApp {
 		List<Transaction> transactions = parseTransactions(buf);
 		HashMap<String, AccountBalance> balances = new HashMap<>();
 		transactions.forEach(
-				(t) -> { 
+				(t) -> {
 					if (!balances.containsKey(t.creditAccount)) {
 						balances.put(t.creditAccount, new AccountBalance(t.creditAccount, 0, 1, t.amount));
 					} else {
 						AccountBalance accountBalance = balances.get(t.creditAccount);
-						accountBalance.balance += t.amount;
+						accountBalance.balance = accountBalance.balance.add(t.amount);
 						accountBalance.creditCount += 1;
 					}
 					
 					if (!balances.containsKey(t.debitAccount)) {
-						balances.put(t.debitAccount, new AccountBalance(t.debitAccount, 1, 0, -t.amount));
+						balances.put(t.debitAccount, new AccountBalance(t.debitAccount, 1, 0, t.amount.negate()));
 					} else {
 						AccountBalance accountBalance = balances.get(t.debitAccount);
-						accountBalance.balance -= t.amount;
+						accountBalance.balance = accountBalance.balance.subtract(t.amount);
 						accountBalance.debitCount += 1;
 					}
 				}
 		);
 		
-		// do estimation how big should the buffer be
+		//TODO do estimation how big should the buffer be
 		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
 		List<AccountBalance> result = new ArrayList<AccountBalance>(balances.values());
 		Collections.sort(result);

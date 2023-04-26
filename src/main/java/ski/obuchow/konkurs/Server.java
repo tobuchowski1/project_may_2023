@@ -17,10 +17,6 @@ import ski.obuchow.konkurs.transactions.TransactionsApp;
 
 public class Server extends AbstractHttpServer
 {
- private static final byte HOME[] = "/".getBytes();
- private static final byte TRANSACTIONS[] = "/transactions/report".getBytes();
- private static final byte GAME[] = "/".getBytes();
- private static final byte ATM[] = "/".getBytes();
 
  @Override
  protected HttpStatus handle(Channel ctx, Buf buf, RapidoidHelper req) {
