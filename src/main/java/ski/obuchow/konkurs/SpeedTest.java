@@ -5,6 +5,8 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import com.dslplatform.json.CompiledJson;
 import com.dslplatform.json.DslJson;
@@ -23,6 +25,8 @@ import java.util.Collections;
 
 import java.lang.reflect.Field;
 
+import org.apache.commons.codec.binary.Hex;
+
 public class SpeedTest {
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_GREEN = "\u001B[32m";
@@ -38,11 +42,12 @@ public class SpeedTest {
 		double transactionUnique = singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-unique-100000.json", 100);
 		double transactionRepeated = singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-repeated-100000.json", 100);
 		double clanRandom = singleThreadedTimeComparison(getUrl("/onlinegame/calculate"), inputDir + "/clan-random-20k.json", 100);
+		double clanSquare = singleThreadedTimeComparison(getUrl("/onlinegame/calculate"), inputDir + "/clan-square-20k.json", 100);
 		double atmRandom = singleThreadedTimeComparison(getUrl("/atms/calculateOrder"), inputDir + "/atm-random-1M.json", 100);
 		double atmDup = singleThreadedTimeComparison(getUrl("/atms/calculateOrder"), inputDir + "/atm-random-dup-1M.json", 100);
 		
 		
-		TimeData times = new TimeData(transactionUniqueSmall, transactionUnique, transactionRepeated, clanRandom, atmRandom, atmDup);
+		TimeData times = new TimeData(transactionUniqueSmall, transactionUnique, transactionRepeated, clanRandom, clanSquare, atmRandom, atmDup);
 		FileOutputStream timeFile = new FileOutputStream(dir + "/lastTimes.json");
 		serializer.serialize(times, timeFile);
 		
@@ -91,8 +96,8 @@ public class SpeedTest {
 			    os.write(out);
 			}
 			
-			http.getInputStream().readAllBytes();
-			//System.out.println("received: " + new String(http.getInputStream().readAllBytes()).length() );
+			byte[] response = http.getInputStream().readAllBytes();
+			//System.out.println("received: " + new String(http.getInputStream().readAllBytes()).length() + " ");
 			long elapsedTime = System.nanoTime() - startTime;
 			
 			// convert nanoseconds to seconds
@@ -103,6 +108,15 @@ public class SpeedTest {
 				} catch (InterruptedException e) {
 				}
 			}
+			if (i == 0) {
+				try {
+					System.out.println(filePath + " hash: " + Hex.encodeHexString(MessageDigest.getInstance("MD5").digest(response)));
+				} catch (NoSuchAlgorithmException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
 		}
 		return Collections.min(times);
 	}
@@ -112,6 +126,7 @@ public class SpeedTest {
 		public final double transactionUniqueSmall;
 		public final double transactionRepeated;
 		public final double clanRandom;
+		public final double clanSquare;
 		public final double atmRandom;
 		public final double atmDup;
 		
@@ -122,6 +137,7 @@ public class SpeedTest {
 				double transactionUnique, 
 				double transactionRepeated, 
 				double clanRandom,
+				double clanSquare,
 				double atmRandom,
 				double atmDup
 				) {
@@ -129,6 +145,7 @@ public class SpeedTest {
 			this.transactionUnique = transactionUnique;
 			this.transactionRepeated = transactionRepeated;
 			this.clanRandom = clanRandom;
+			this.clanSquare = clanSquare;
 			this.atmRandom = atmRandom;
 			this.atmDup = atmDup;
 		}

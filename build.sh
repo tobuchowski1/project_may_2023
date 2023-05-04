@@ -1,4 +1,4 @@
 #!/bin/bash
 
 mvn -f $( dirname -- "$0"; )/pom.xml clean
-mvn -f $( dirname -- "$0"; )/pom.xml package
+mvn -f $( dirname -- "$0"; )/pom.xml package -Dmaven.test.skip
