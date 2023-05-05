@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 
 import com.dslplatform.json.CompiledJson;
 import com.dslplatform.json.DslJson;
+import com.dslplatform.json.runtime.Settings;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,8 +23,8 @@ import java.math.RoundingMode;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Hex;
 
@@ -33,53 +34,59 @@ public class SpeedTest {
 	public static final String ANSI_RED = "\u001B[31m";
 	private static final int port = 8080;
 	private static final String host = "localhost";
-	private static DslJson<TimeData> serializer = new DslJson<TimeData>();
+	private static DslJson<TestDataWrapper> serializer = new DslJson<TestDataWrapper>(Settings.basicSetup());
 	
 	public static void main(String[] args) throws IOException, IllegalArgumentException, IllegalAccessException {
 		String dir = args[0];
 		String inputDir = dir + "/in";
-		double transactionUniqueSmall = singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-unique-10.json", 10000);
-		double transactionUnique = singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-unique-100000.json", 100);
-		double transactionRepeated = singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-repeated-100000.json", 100);
-		double clanRandom = singleThreadedTimeComparison(getUrl("/onlinegame/calculate"), inputDir + "/clan-random-20k.json", 100);
-		double clanSquare = singleThreadedTimeComparison(getUrl("/onlinegame/calculate"), inputDir + "/clan-square-20k.json", 100);
-		double atmRandom = singleThreadedTimeComparison(getUrl("/atms/calculateOrder"), inputDir + "/atm-random-1M.json", 100);
-		double atmDup = singleThreadedTimeComparison(getUrl("/atms/calculateOrder"), inputDir + "/atm-random-dup-1M.json", 100);
+		HashMap<String, TestData> results = new HashMap<String, TestData>();
 		
+		results.put("transactionUniqueSmall", singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-unique-10.json", 10000));
+		results.put("transactionUnique", singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-unique-100000.json", 100));
+		results.put("transactionRepeated", singleThreadedTimeComparison(getUrl("/transactions/report"), inputDir + "/transaction-repeated-100000.json", 100));
+		results.put("clanRandom", singleThreadedTimeComparison(getUrl("/onlinegame/calculate"), inputDir + "/clan-random-20k.json", 100));
+		results.put("clanSquare", singleThreadedTimeComparison(getUrl("/onlinegame/calculate"), inputDir + "/clan-square-20k.json", 100));
+		results.put("atmRandom", singleThreadedTimeComparison(getUrl("/atms/calculateOrder"), inputDir + "/atm-random-1M.json", 100));
+		results.put("atmDup", singleThreadedTimeComparison(getUrl("/atms/calculateOrder"), inputDir + "/atm-random-dup-1M.json", 100));
 		
-		TimeData times = new TimeData(transactionUniqueSmall, transactionUnique, transactionRepeated, clanRandom, clanSquare, atmRandom, atmDup);
+		TestDataWrapper wrapped = new TestDataWrapper(results);
+		
 		FileOutputStream timeFile = new FileOutputStream(dir + "/lastTimes.json");
-		serializer.serialize(times, timeFile);
+		serializer.serialize(wrapped, timeFile);
 		timeFile.close();
 		
 		FileInputStream baselineFile = new FileInputStream(dir + "/baseline.json");
-		TimeData baseline = serializer.deserialize(TimeData.class, baselineFile);
+		TestDataWrapper baseline = serializer.deserialize(TestDataWrapper.class, baselineFile);
 		baselineFile.close();
 		
-		Field[] fields = baseline.getClass().getDeclaredFields();
-		for (Field field : fields) {
-			double baseVal = (double)field.get(baseline);
-			double val = (double)field.get(times);
-			double diff = (baseVal - val)/baseVal;
+		for (Map.Entry<String, TestData> entry: results.entrySet()) {
+			String key = entry.getKey();
+			TestData val = entry.getValue();
+			TestData baseVal = baseline.map.get(key); 
+			double diff = (baseVal.minTime - val.minTime)/baseVal.minTime;
 			String color = ANSI_GREEN;
 			
 			if (diff > 0.1) {
 				color = ANSI_RED;
 			}
 			
-			System.out.println(color + field.getName() + ": " + new BigDecimal(diff).setScale(3, RoundingMode.HALF_UP) + ANSI_RESET);
+			String isOK = "OK";
+			if (!val.hash.equals(baseVal.hash))
+				isOK = "ERROR";
+			
+			System.out.println(color + key + ": " + new BigDecimal(diff).setScale(3, RoundingMode.HALF_UP) + "  " + isOK + ANSI_RESET);
 		}
-		
 	}
 	
 	private static String getUrl(String endpoint) {
 		return "http://" + host + ":" + port + endpoint; 
 	}
 	
-	private static double singleThreadedTimeComparison(String URL, String filePath, int count) throws IOException {
+	private static TestData singleThreadedTimeComparison(String URL, String filePath, int count) throws IOException {
 		Path path = Paths.get(filePath);
 		byte[] out = Files.readAllBytes(path);
 		ArrayList<Double> times = new ArrayList<Double>();
+		String hash = "";
 		for (int i=0; i<count; i++) {
 			long startTime = System.nanoTime();
 			
@@ -112,7 +119,8 @@ public class SpeedTest {
 			}
 			if (i == 0) {
 				try {
-					System.out.println(filePath + " hash: " + Hex.encodeHexString(MessageDigest.getInstance("MD5").digest(response)));
+					hash = Hex.encodeHexString(MessageDigest.getInstance("MD5").digest(response));
+					System.out.println(filePath + " hash: " + hash);
 				} catch (NoSuchAlgorithmException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -120,37 +128,26 @@ public class SpeedTest {
 				
 			}
 		}
-		return Collections.min(times);
+		return new TestData(Collections.min(times), hash);
 	}
-
-	public static class TimeData {
-		public final double transactionUnique;
-		public final double transactionUniqueSmall;
-		public final double transactionRepeated;
-		public final double clanRandom;
-		public final double clanSquare;
-		public final double atmRandom;
-		public final double atmDup;
+	
+	public static class TestDataWrapper {
+		public HashMap<String, TestData> map;
 		
-
 		@CompiledJson
-		public TimeData(
-				double transactionUniqueSmall, 
-				double transactionUnique, 
-				double transactionRepeated, 
-				double clanRandom,
-				double clanSquare,
-				double atmRandom,
-				double atmDup
-				) {
-			this.transactionUniqueSmall = transactionUniqueSmall;
-			this.transactionUnique = transactionUnique;
-			this.transactionRepeated = transactionRepeated;
-			this.clanRandom = clanRandom;
-			this.clanSquare = clanSquare;
-			this.atmRandom = atmRandom;
-			this.atmDup = atmDup;
+		public TestDataWrapper(HashMap<String, TestData> map) {
+			this.map = map;
 		}
 	}
 	
+	public static class TestData {
+		public final double minTime;
+		public final String hash;
+		
+		@CompiledJson
+		public TestData(double minTime, String hash) {
+			this.minTime = minTime;
+			this.hash = hash;
+		}
+	}
 }
