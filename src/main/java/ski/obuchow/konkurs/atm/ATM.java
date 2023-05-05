@@ -13,7 +13,7 @@ public class ATM extends ATMBasic implements Comparable<ATM> {
 		SIGNAL_LOW(2),
 		STANDARD(3);
 
-		private final int value;
+		public final int value;
 
 		Priority(int value) {
 			this.value = value;
