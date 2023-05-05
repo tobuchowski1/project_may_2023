@@ -18,13 +18,14 @@ import org.rapidoid.buffer.Buf;
 public class ATMApp {
 	private static DslJson<List<ATM>> inoputParser = new DslJson<List<ATM>>();
 	private static DslJson<List<ATMBasic>> outputParser = new DslJson<List<ATMBasic>>();
-
+	private static final int atmBytes = 32;
+	
 	public static byte[] solve(Buf buf) throws IOException {
 		List<ATM> atms = parseATMs(buf);
 		
 		List<ATMBasic> result = solutionLinear(atms);
 		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(30*result.size());
+		ByteArrayOutputStream os = new ByteArrayOutputStream(atmBytes*result.size());
 		outputParser.serialize(result, os);
 		return os.toByteArray();
 	}
@@ -44,8 +45,6 @@ public class ATMApp {
 				result.add(new ATMBasic(atm.region, atm.atmId));
 			}
 		}
-		
-		 
 		return result;
 	}
 	

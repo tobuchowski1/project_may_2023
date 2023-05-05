@@ -22,14 +22,14 @@ import com.dslplatform.json.JsonWriter;
 public class GameApp {
 	private static DslJson<Clans> inputParser = new DslJson<Clans>();
 	private static DslJson<List<List<Clan>>> outputSerializer = new DslJson<List<List<Clan>>>();
-
+	private static final int clanBytes = 43;
 	
 	public static byte[] solve(Buf buf) throws IOException {
 		Clans inputClans = parseClans(buf);
 		
 		List<ResultGroup> result = solutionIntervalTree(inputClans);
 		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(40*inputClans.clans.size());
+		ByteArrayOutputStream os = new ByteArrayOutputStream(clanBytes*inputClans.clans.size());
 		outputSerializer.serialize(result, os);
 		return os.toByteArray();
 	}

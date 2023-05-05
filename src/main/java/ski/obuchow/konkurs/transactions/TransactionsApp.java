@@ -16,7 +16,7 @@ import com.dslplatform.json.DslJson;
 public class TransactionsApp {
 	private static DslJson<Transaction> inputParser = new DslJson<Transaction>();
 	private static DslJson<AccountBalance> outputSerializer = new DslJson<AccountBalance>();
-	
+	private static final int transactionBytes = 105;
 	
 	public static byte[] solve(Buf buf) throws IOException {
 		List<Transaction> transactions = parseTransactions(buf);
@@ -45,7 +45,7 @@ public class TransactionsApp {
 		List<AccountBalance> result = new ArrayList<AccountBalance>(balances.values());
 		Collections.sort(result);
 		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(100*result.size());
+		ByteArrayOutputStream os = new ByteArrayOutputStream(transactionBytes*result.size());
 		outputSerializer.serialize(result, os);
 		return os.toByteArray();
 	}
