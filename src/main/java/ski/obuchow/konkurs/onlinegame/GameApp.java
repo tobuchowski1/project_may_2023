@@ -4,7 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -24,10 +26,20 @@ public class GameApp {
 	
 	public static byte[] solve(Buf buf) throws IOException {
 		Clans inputClans = parseClans(buf);
+		
+		List<ResultGroup> result = solutionIntervalTree(inputClans);
+		
+		//TODO do estimation how big should the buffer be
+		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
+		outputSerializer.serialize(result, os);
+		return os.toByteArray();
+	}
+	
+    public static List<ResultGroup> solutionA(Clans inputClans) {
 		List<ResultGroup> result = new LinkedList<ResultGroup>();
 		ArrayList<PriorityQueue<Clan>> clansBySize = new ArrayList<PriorityQueue<Clan>>();
 	
-		for (int i =1; i <= inputClans.groupCount + 1; i++)
+		for (int i = 1; i <= inputClans.groupCount + 1; i++)
 			clansBySize.add(new PriorityQueue<Clan>(Comparator.comparingInt(Clan::getPoints).reversed()));
 			
 		inputClans.clans.forEach((clan) -> clansBySize.get(clan.numberOfPlayers).add(clan));
@@ -66,13 +78,63 @@ public class GameApp {
 			}
 		}
 		
-		//TODO do estimation how big should the buffer be
-		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
-		outputSerializer.serialize(result, os);
-		return os.toByteArray();
+		
+		return result;
 	}
 	
+    public static List<ResultGroup> solutionIntervalTree(Clans inputClans) {
+    	List<ResultGroup> result = new LinkedList<ResultGroup>();
+    	IntervalTree tree = new IntervalTree(inputClans.groupCount);
+    	
+    	for (Clan clan : inputClans.clans) {
+    		tree.addClan(clan);
+    	}
+    	
+    	ResultGroup currentGroup = new ResultGroup();
+		int playersInGroup = 0;
+    	
+    	while (tree.size() > 0) {
+    		Clan clan = tree.popClan(inputClans.groupCount - playersInGroup);
+    		if (clan == null) {
+    			result.add(currentGroup);
+    			playersInGroup = 0;
+    			currentGroup = new ResultGroup();
+    		} else {
+    			currentGroup.clans.add(clan);
+    			playersInGroup += clan.numberOfPlayers;
+    		}
+    	}
+    	result.add(currentGroup);
+    	
+    	return result;
+    }
 	
+    public static List<ResultGroup> solutionSquare(Clans inputClans) {
+    	LinkedList<Clan> clans = new LinkedList<Clan>(); 
+    	clans.addAll(inputClans.clans);
+    	Collections.sort(clans);
+    	List<ResultGroup> result = new LinkedList<ResultGroup>();
+    	
+    	
+    	while (!clans.isEmpty()) {
+    		ResultGroup currentGroup = new ResultGroup();
+    		int playersInGroup = 0;
+    		Iterator<Clan> it = clans.iterator();
+    		while (it.hasNext()) {
+    			Clan clan = it.next();
+    			if (clan.numberOfPlayers + playersInGroup <= inputClans.groupCount) {
+    				playersInGroup += clan.numberOfPlayers;
+    				currentGroup.clans.add(clan);
+    				it.remove();
+    			}
+    		}
+    		result.add(currentGroup);
+    	}
+    	
+    	
+    	return result;
+    }
+    
 	private static Clans parseClans(Buf buf) throws IOException {
 		int size = buf.size();
 		ByteBuffer byteBuffer = ByteBuffer.allocate(buf.size());

@@ -50,9 +50,11 @@ public class SpeedTest {
 		TimeData times = new TimeData(transactionUniqueSmall, transactionUnique, transactionRepeated, clanRandom, clanSquare, atmRandom, atmDup);
 		FileOutputStream timeFile = new FileOutputStream(dir + "/lastTimes.json");
 		serializer.serialize(times, timeFile);
+		timeFile.close();
 		
 		FileInputStream baselineFile = new FileInputStream(dir + "/baseline.json");
 		TimeData baseline = serializer.deserialize(TimeData.class, baselineFile);
+		baselineFile.close();
 		
 		Field[] fields = baseline.getClass().getDeclaredFields();
 		for (Field field : fields) {
