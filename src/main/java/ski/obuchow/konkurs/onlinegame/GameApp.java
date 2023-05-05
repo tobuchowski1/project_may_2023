@@ -29,8 +29,7 @@ public class GameApp {
 		
 		List<ResultGroup> result = solutionIntervalTree(inputClans);
 		
-		//TODO do estimation how big should the buffer be
-		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
+		ByteArrayOutputStream os = new ByteArrayOutputStream(40*inputClans.clans.size());
 		outputSerializer.serialize(result, os);
 		return os.toByteArray();
 	}

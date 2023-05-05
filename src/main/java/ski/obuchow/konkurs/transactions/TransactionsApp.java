@@ -41,11 +41,11 @@ public class TransactionsApp {
 				}
 		);
 		
-		//TODO do estimation how big should the buffer be
-		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
+		
 		List<AccountBalance> result = new ArrayList<AccountBalance>(balances.values());
 		Collections.sort(result);
 		
+		ByteArrayOutputStream os = new ByteArrayOutputStream(100*result.size());
 		outputSerializer.serialize(result, os);
 		return os.toByteArray();
 	}

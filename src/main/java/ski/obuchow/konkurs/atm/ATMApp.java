@@ -24,8 +24,7 @@ public class ATMApp {
 		
 		List<ATMBasic> result = solutionLinear(atms);
 		
-		//TODO do estimation how big should the buffer be
-		ByteArrayOutputStream os = new ByteArrayOutputStream(10000);
+		ByteArrayOutputStream os = new ByteArrayOutputStream(30*result.size());
 		outputParser.serialize(result, os);
 		return os.toByteArray();
 	}
