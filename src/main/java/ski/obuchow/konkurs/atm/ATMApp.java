@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import org.rapidoid.buffer.Buf;
 
 public class ATMApp {
-	private static DslJson<List<ATM>> inoputParser = new DslJson<List<ATM>>();
+	private static DslJson<List<ATM>> inputParser = new DslJson<List<ATM>>();
 	private static DslJson<List<ATMBasic>> outputParser = new DslJson<List<ATMBasic>>();
 	private static final int atmBytes = 32;
 	
@@ -82,6 +82,6 @@ public class ATMApp {
 		int size = buf.size();
 		ByteBuffer byteBuffer = ByteBuffer.allocate(buf.size());
 		buf.writeTo(byteBuffer);
-		return inoputParser.deserializeList(ATM.class, byteBuffer.array(), size);
+		return inputParser.deserializeList(ATM.class, byteBuffer.array(), size);
 	}
 }
