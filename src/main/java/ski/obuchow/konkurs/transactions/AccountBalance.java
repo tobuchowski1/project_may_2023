@@ -19,6 +19,10 @@ public class AccountBalance implements Comparable<AccountBalance> {
 		this.creditCount = creditCount;
 		this.balance = balance;
 	}
+	
+	public static AccountBalance create(String account) {
+		return new AccountBalance(account, 0, 0, new BigDecimal(0).setScale(2));
+	}
 
 	@Override
 	public int compareTo(AccountBalance other) {
