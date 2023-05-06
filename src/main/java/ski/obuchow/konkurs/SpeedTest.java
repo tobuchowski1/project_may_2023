@@ -87,6 +87,7 @@ public class SpeedTest {
 		byte[] out = Files.readAllBytes(path);
 		ArrayList<Double> times = new ArrayList<Double>();
 		String hash = "";
+		int failures = 0;
 		for (int i=0; i<count; i++) {
 			long startTime = System.nanoTime();
 			
@@ -105,7 +106,15 @@ public class SpeedTest {
 			    os.write(out);
 			}
 			
-			byte[] response = http.getInputStream().readAllBytes();
+			byte[] response;
+			try {
+				 response = http.getInputStream().readAllBytes();
+			}catch (IOException e ) {
+				failures++;
+//				System.out.println(http.getErrorStream().toString());
+				continue;
+			}
+			
 			//System.out.println("received: " + new String(http.getInputStream().readAllBytes()).length() + " ");
 			long elapsedTime = System.nanoTime() - startTime;
 			
@@ -128,6 +137,8 @@ public class SpeedTest {
 				
 			}
 		}
+		System.out.println(failures + " failures");
+		times.add(99.0);
 		return new TestData(Collections.min(times), hash);
 	}
 	
