@@ -64,9 +64,10 @@ public class SpeedTest {
 			TestData val = entry.getValue();
 			TestData baseVal = baseline.map.get(key); 
 			double diff = (baseVal.minTime - val.minTime)/baseVal.minTime;
+			double diff90th = (baseVal.time90th - val.time90th)/baseVal.time90th;
 			String color = ANSI_GREEN;
 			
-			if (diff > 0.1) {
+			if (diff > 0.1 || diff90th > 0.1) {
 				color = ANSI_RED;
 			}
 			
@@ -74,7 +75,10 @@ public class SpeedTest {
 			if (!val.hash.equals(baseVal.hash))
 				isOK = "ERROR";
 			
-			System.out.println(color + key + ": " + new BigDecimal(diff).setScale(3, RoundingMode.HALF_UP) + "  " + isOK + ANSI_RESET);
+			BigDecimal diffDecimal = new BigDecimal(diff).setScale(3, RoundingMode.HALF_UP);
+			BigDecimal diff90thDecimal = new BigDecimal(diff90th).setScale(3, RoundingMode.HALF_UP);
+			
+			System.out.println(color + key + ": " + diffDecimal + "  " + diff90thDecimal + "  " + isOK + ANSI_RESET);
 		}
 	}
 	
@@ -139,7 +143,8 @@ public class SpeedTest {
 		}
 		System.out.println(failures + " failures");
 		times.add(99.0);
-		return new TestData(Collections.min(times), hash);
+		Collections.sort(times);
+		return new TestData(times.get(0), times.get(times.size()/10*9), hash);
 	}
 	
 	public static class TestDataWrapper {
@@ -153,12 +158,14 @@ public class SpeedTest {
 	
 	public static class TestData {
 		public final double minTime;
+		public final double time90th;
 		public final String hash;
 		
 		@CompiledJson
-		public TestData(double minTime, String hash) {
+		public TestData(double minTime, double time90th, String hash) {
 			this.minTime = minTime;
 			this.hash = hash;
+			this.time90th = time90th;
 		}
 	}
 }
