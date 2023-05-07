@@ -1,14 +1,12 @@
 package ski.obuchow.konkurs.transactions;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-
-import java.nio.ByteBuffer;
-import org.rapidoid.buffer.Buf;
 
 
 import com.dslplatform.json.DslJson;
@@ -18,14 +16,10 @@ public class TransactionsApp {
 	private static DslJson<AccountBalance> outputSerializer = new DslJson<AccountBalance>();
 	private static final int transactionBytes = 105;
 	
-	public static byte[] solve(Buf buf) throws IOException {
-		List<Transaction> transactions = parseTransactions(buf);
-		
+	public static void solve(InputStream is, OutputStream os) throws IOException {
+		List<Transaction> transactions = inputParser.deserializeList(Transaction.class, is);
 		List<AccountBalance> result = solution(transactions);
-		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(transactionBytes*result.size());
 		outputSerializer.serialize(result, os);
-		return os.toByteArray();
 	}
 	
 	
@@ -47,12 +41,4 @@ public class TransactionsApp {
 		Collections.sort(result);
 		return result;
 	}
-	
-	private static List<Transaction> parseTransactions(Buf buf) throws IOException {
-		int size = buf.size();
-		ByteBuffer byteBuffer = ByteBuffer.allocate(buf.size());
-		buf.writeTo(byteBuffer);
-		return inputParser.deserializeList(Transaction.class, byteBuffer.array(), size);
-	}
-	
 }

@@ -2,9 +2,9 @@ package ski.obuchow.konkurs.atm;
 
 import com.dslplatform.json.DslJson;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -13,24 +13,18 @@ import java.util.HashSet;
 import java.util.ArrayList;
 
 
-import org.rapidoid.buffer.Buf;
-
 public class ATMApp {
 	private static DslJson<List<ATM>> inputParser = new DslJson<List<ATM>>();
 	private static DslJson<List<ATMBasic>> outputParser = new DslJson<List<ATMBasic>>();
 	private static final int atmBytes = 32;
 	
-	public static byte[] solve(Buf buf) throws IOException {
-		List<ATM> atms = parseATMs(buf);
-		
+	public static void solve(InputStream is, OutputStream os) throws IOException {
+		List<ATM> atms = inputParser.deserializeList(ATM.class, is);
 		List<ATMBasic> result = solutionLinear(atms);
-		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(atmBytes*result.size());
 		outputParser.serialize(result, os);
-		return os.toByteArray();
 	}
 	
-	public static List<ATMBasic> solution(List<ATM> atms) {
+	public static List<ATMBasic> solutionSort(List<ATM> atms) {
 		Collections.sort(atms);
 		List<ATMBasic> result = new LinkedList<ATMBasic>();
 		
@@ -76,12 +70,5 @@ public class ATMApp {
 		}
 		 
 		return result;
-	}
-	
-	private static List<ATM> parseATMs(Buf buf) throws IOException {
-		int size = buf.size();
-		ByteBuffer byteBuffer = ByteBuffer.allocate(buf.size());
-		buf.writeTo(byteBuffer);
-		return inputParser.deserializeList(ATM.class, byteBuffer.array(), size);
 	}
 }

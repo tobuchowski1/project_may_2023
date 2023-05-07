@@ -1,8 +1,8 @@
 package ski.obuchow.konkurs.onlinegame;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,8 +10,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
-
-import org.rapidoid.buffer.Buf;
 
 import com.dslplatform.json.DslJson;
 import com.dslplatform.json.JsonConverter;
@@ -22,16 +20,12 @@ import com.dslplatform.json.JsonWriter;
 public class GameApp {
 	private static DslJson<Clans> inputParser = new DslJson<Clans>();
 	private static DslJson<List<List<Clan>>> outputSerializer = new DslJson<List<List<Clan>>>();
-	private static final int clanBytes = 43;
+	private static final int clanBytes = 43; //inputClans.clans.size()
 	
-	public static byte[] solve(Buf buf) throws IOException {
-		Clans inputClans = parseClans(buf);
-		
+	public static void solve(InputStream is, OutputStream os) throws IOException {
+		Clans inputClans = inputParser.deserialize(Clans.class, is);
 		List<ResultGroup> result = solutionIntervalTree(inputClans);
-		
-		ByteArrayOutputStream os = new ByteArrayOutputStream(clanBytes*inputClans.clans.size());
 		outputSerializer.serialize(result, os);
-		return os.toByteArray();
 	}
 	
     public static List<ResultGroup> solutionA(Clans inputClans) {
@@ -133,13 +127,6 @@ public class GameApp {
     	
     	return result;
     }
-    
-	private static Clans parseClans(Buf buf) throws IOException {
-		int size = buf.size();
-		ByteBuffer byteBuffer = ByteBuffer.allocate(buf.size());
-		buf.writeTo(byteBuffer);
-		return inputParser.deserialize(Clans.class, byteBuffer.array(), size);
-	}
 	
 	// dsl-json couldn't handle nested lists without custom converter :( 
 	@JsonConverter(target = ResultGroup.class)
