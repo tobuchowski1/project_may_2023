@@ -16,7 +16,6 @@ import java.util.ArrayList;
 public class ATMApp {
 	private static DslJson<List<ATM>> inputParser = new DslJson<List<ATM>>();
 	private static DslJson<List<ATMBasic>> outputParser = new DslJson<List<ATMBasic>>();
-	private static final int atmBytes = 32;
 	
 	public static void solve(InputStream is, OutputStream os) throws IOException {
 		List<ATM> atms = inputParser.deserializeList(ATM.class, is);
@@ -43,6 +42,7 @@ public class ATMApp {
 	}
 	
 	public static List<ATMBasic> solutionLinear(List<ATM> atms) {
+	    // this solution uses positional sorting to improve complexity
 		List<ATMBasic> result = new LinkedList<ATMBasic>();
 		int regionMax = 0;
 		for (ATM atm: atms) {

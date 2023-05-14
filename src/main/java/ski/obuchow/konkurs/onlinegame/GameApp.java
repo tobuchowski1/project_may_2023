@@ -20,7 +20,6 @@ import com.dslplatform.json.JsonWriter;
 public class GameApp {
 	private static DslJson<Clans> inputParser = new DslJson<Clans>();
 	private static DslJson<List<List<Clan>>> outputSerializer = new DslJson<List<List<Clan>>>();
-	private static final int clanBytes = 43; //inputClans.clans.size()
 	
 	public static void solve(InputStream is, OutputStream os) throws IOException {
 		Clans inputClans = inputParser.deserialize(Clans.class, is);

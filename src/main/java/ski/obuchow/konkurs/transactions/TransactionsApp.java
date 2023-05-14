@@ -14,7 +14,6 @@ import com.dslplatform.json.DslJson;
 public class TransactionsApp {
 	private static DslJson<Transaction> inputParser = new DslJson<Transaction>();
 	private static DslJson<AccountBalance> outputSerializer = new DslJson<AccountBalance>();
-	private static final int transactionBytes = 105;
 	
 	public static void solve(InputStream is, OutputStream os) throws IOException {
 		List<Transaction> transactions = inputParser.deserializeList(Transaction.class, is);

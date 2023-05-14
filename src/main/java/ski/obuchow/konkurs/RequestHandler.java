@@ -33,7 +33,7 @@ public class RequestHandler implements HttpHandler {
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         exchange.startBlocking();
         
-        // endpoints with double slashes was generated from provided OpenAPI description
+        // endpoints with double slashes were generated from provided OpenAPI description
         // making sure server responds to both
 		String path = exchange.getRelativePath().replace("//", "/");
 		
