@@ -57,16 +57,18 @@ public class ATMApp {
 		}
 		
 		for (List<ATM> atmReg: atmByRegion) {
-			Set<Integer> includedATMs = new HashSet<Integer>();
-			for (int i=0; i<4; i++) {
-				for (ATM atm: atmReg) {
-					if (atm.priority.value == i) {
-						if (includedATMs.add(atm.atmId)) {
-							result.add(new ATMBasic(atm.region, atm.atmId));
-						}
-					}
-				}
-			}
+		    if (atmReg.size() > 0) {
+    			Set<Integer> includedATMs = new HashSet<Integer>();
+    			for (int i=0; i<4; i++) {
+    				for (ATM atm: atmReg) {
+    					if (atm.priority.value == i) {
+    						if (includedATMs.add(atm.atmId)) {
+    							result.add(new ATMBasic(atm.region, atm.atmId));
+    						}
+    					}
+    				}
+    			}
+		    }
 		}
 		 
 		return result;
