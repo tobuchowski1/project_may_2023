@@ -8,6 +8,7 @@ import org.jboss.logging.Logger;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.ResponseCodeHandler;
 import io.undertow.util.Headers;
 import io.undertow.util.Methods;
 import ski.obuchow.konkurs.atm.ATMApp;
@@ -26,11 +27,16 @@ public class RequestHandler implements HttpHandler {
 		if (!exchange.getRequestMethod().equals(Methods.POST)) {
 		    return;
 		}
+		// picking a high max value because we expect big input json files
+		// 1GB should be more than enough
 		exchange.setMaxEntitySize(1000000000);
         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
         exchange.startBlocking();
         
+        // endpoints with double slashes was generated from provided OpenAPI description
+        // making sure server responds to both
 		String path = exchange.getRelativePath().replace("//", "/");
+		
 		InputStream inputStream = exchange.getInputStream();
 		OutputStream outputStream = exchange.getOutputStream();
 		
@@ -47,8 +53,8 @@ public class RequestHandler implements HttpHandler {
 				ATMApp.solve(inputStream, outputStream);
 				break;
 			default:
-//				return HttpStatus.NOT_FOUND;
-				break;
+			    ResponseCodeHandler.HANDLE_404.handleRequest(exchange);
+				return;
 		}
 		exchange.getResponseSender().close();
 	}
