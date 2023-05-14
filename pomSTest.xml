@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>ski.obuchow</groupId>
+  <artifactId>konkurs</artifactId>
+  <version>0.1.0</version>
+
+  <parent>
+    <groupId>at.stderr</groupId>
+    <artifactId>maven-parent</artifactId>
+    <version>2.3.0</version>
+  </parent>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Build an executable JAR -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+		  <release>11</release>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>lib/</classpathPrefix>
+              <mainClass>${project.groupId}.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <properties>
+    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+</properties>
+
+  <dependencies>
+  	<dependency>
+  	    <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.15</version>
+	</dependency>
+  	<dependency>
+  		<groupId>com.dslplatform</groupId>
+  		<artifactId>dsl-json-java8</artifactId>
+  		<version>1.10.0</version>
+	</dependency>
+  </dependencies>
+</project>
