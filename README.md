@@ -1,3 +1,5 @@
+[![CodeQL](https://github.com/tobuchowski1/project_may_2023/actions/workflows/codeql.yml/badge.svg)](https://github.com/tobuchowski1/project_may_2023/actions/workflows/codeql.yml)
+
 ## dependencies
 
 - [undertow](https://github.com/undertow-io/undertow) - Apache License v2
