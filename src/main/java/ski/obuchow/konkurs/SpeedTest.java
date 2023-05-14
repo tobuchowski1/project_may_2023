@@ -115,11 +115,9 @@ public class SpeedTest {
 				 response = http.getInputStream().readAllBytes();
 			}catch (IOException e ) {
 				failures++;
-//				System.out.println(http.getErrorStream().toString());
 				continue;
 			}
 			
-			//System.out.println("received: " + new String(http.getInputStream().readAllBytes()).length() + " ");
 			long elapsedTime = System.nanoTime() - startTime;
 			
 			// convert nanoseconds to seconds
@@ -132,7 +130,7 @@ public class SpeedTest {
 			}
 			if (i == 0) {
 				try {
-					hash = Hex.encodeHexString(MessageDigest.getInstance("MD5").digest(response));
+					hash = Hex.encodeHexString(MessageDigest.getInstance("SHA-512").digest(response));
 					System.out.println(filePath + " hash: " + hash);
 				} catch (NoSuchAlgorithmException e) {
 					// TODO Auto-generated catch block
