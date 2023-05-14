@@ -23,7 +23,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
-		  <release>11</release>
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
