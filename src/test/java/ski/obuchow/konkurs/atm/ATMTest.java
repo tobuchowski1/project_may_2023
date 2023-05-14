@@ -2,16 +2,12 @@ package ski.obuchow.konkurs.atm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import ski.obuchow.konkurs.atm.ATM.Priority;
-import ski.obuchow.konkurs.transactions.AccountBalance;
-import ski.obuchow.konkurs.transactions.Transaction;
-import ski.obuchow.konkurs.transactions.TransactionsApp;
 
 public class ATMTest {
     private List<ATM> getInput2() {
