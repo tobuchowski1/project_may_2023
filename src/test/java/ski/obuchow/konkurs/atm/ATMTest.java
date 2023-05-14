@@ -29,6 +29,8 @@ public class ATMTest {
         atms.add(new ATM(1, 1, Priority.STANDARD));
         atms.add(new ATM(2, 3, Priority.PRIORITY));
         atms.add(new ATM(3, 4, Priority.STANDARD));
+        atms.add(new ATM(3, 4, Priority.STANDARD));
+        atms.add(new ATM(3, 4, Priority.STANDARD));
         atms.add(new ATM(4, 5, Priority.STANDARD));
         atms.add(new ATM(5, 2, Priority.PRIORITY));
         atms.add(new ATM(5, 1, Priority.STANDARD));

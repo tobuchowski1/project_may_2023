@@ -5,6 +5,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+
+// this is a binary tree allowing to search for a clan group with highest amount of points with the
+// number of players lower or equal to a given number. Adding and removing clan operations are done in logM time
+// where M is the max size of the player group
+
 public class IntervalTree {
 	private final int base; 
 	private int[] tree;
